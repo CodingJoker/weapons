@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no" name="viewport">
+    <meta content="yes" name="apple-mobile-web-app-capable">
+    <meta content="black" name="apple-mobile-web-app-status-bar-style">
+    <meta content="telephone=no" name="format-detection">
+    <meta content="email=no" name="format-detection">
+    <title>H5标题</title>
+    <link rel="stylesheet" href="//gad.qpic.cn/tig/h5/vendor/css/optimize.css">
+    <script type="text/javascript">
+      // rem设置
+      (function(x) {function w() { var s = x.document, r = s.documentElement, screenW = window.screen.width, screenH = window.screen.height; if (screenW / screenH < 1) {a = screenW; } else {a = screenH; } if(a>=562.5){r.style.fontSize = "15px"; } else if (a<=320)  {r.style.fontSize = "8.53px"; } else{r.style.fontSize = a / 37.5 + "px"; } } x.addEventListener("resize", function() {w(); }); w(); })(window);
+    </script>
+    <style>
+        .main {
+            height: 100%;
+        }
+        .scroll-container {
+            display: block;
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transition: all 1000ms ease;
+            margin: 0;
+            padding: 0;
+        }
+        .scroll-page {
+            margin: 0;
+            padding: 0;
+        }
+        .page1 {
+            height: 100vh;
+            background: black;
+        }
+        .page2 {
+            height: 800px;
+            background: red;
+        }
+        .page3 {
+            height: 200px;
+            background: blue;
+        }
+    </style>
+</head>
+<body>
+<!--提示竖屏-->
+<div id="orientLayer" class="mod-orient-layer">
+    <div class="mod-orient-layer-content">
+        <i class="icon mod-orient-layer-icon-orient"></i>
+        <div class="mod-orient-layer-desc">为了更好的体验，请使用竖屏浏览</div>
+    </div>
+</div>
+<!--PC打开显示二维码-->
+<div class="qr-container">
+    <div class="qr-box">
+        <div id="qr-box-img" class="qr-box-img"></div>
+        <div class="qr-box-thumb qr-box-thumb_default" style="background-image:url(//wximg.gtimg.com/wxp/wxmoment-source/img/weixin-logo.png)"></div>
+        <div id="qr-box-thumb" class="qr-box-thumb"></div>
+        <div class="qr-box-text">微信扫一扫<br>手机浏览效果更佳</div>
+    </div>
+</div>
+<!--这里是活动内容-->
+<div class="main">
+    <div class="scroll-container">
+        <div class="scroll-page page1">
+        </div>
+        <div class="scroll-page page2">            <div>123456</div>
+        </div>
+        <div class="scroll-page page3"></div>
+    </div>
+</div>
+<script src="//gad.qpic.cn/tig/h5/vendor/js/require.js"></script>
+<script src="//gad.qpic.cn/tig/h5/vendor/js/main.js"></script>
+<script type="text/javascript">
+  // 自动设置PC端扫描二维码地址
+  var pagesOffsetTop = [];
+  var currentPage = 0;
+  document.getElementById('qr-box-img').style.backgroundImage = 'url(https://game.weixin.qq.com/cgi-bin/comm/qrcode?s=10&m=1&d=' + encodeURIComponent(location.href) + ')';
+  require(['zepto', 'pre-load-img'], function($, preLoad) {
+    // zepto已加载，在这里使用
+    console.log($);
+    var pages = document.getElementsByClassName('scroll-page');
+    var offsetTopByPage = 0;
+    for (var i = 0, length = pages.length; i < length; i++) {
+      pagesOffsetTop.push(offsetTopByPage);
+      pages[i].style.position = 'absolute';
+      pages[i].style.top = offsetTopByPage + 'px';
+      pages[i].style.width = '100%';
+      pages[i].style.height = pages[i].scrollHeight + 'px';
+      offsetTopByPage += pages[i].scrollHeight;
+    }
+  });
+
+  function goPage(num) {
+    var scrollContainer = document.getElementsByClassName('scroll-container')[0];
+    scrollContainer.style.transform = 'translate(0px, -' + (pagesOffsetTop[num] + 7) + 'px)';
+  }
+  var scrollContainer = document.getElementsByClassName('scroll-container')[0];
+  var startY = 0;
+  var endY = 0;
+  scrollContainer.addEventListener('touchstart', function(e) {
+    if (/scroll-page/.test(e.srcElement.className)) {
+      console.log(e);
+      startY = e.touches[0].clientY;
+      e.preventDefault()
+    }
+  }, true);
+  scrollContainer.addEventListener('touchend', function(e) {
+    if (/scroll-page/.test(e.srcElement.className)) {
+      console.log(e);
+      endY = e.changedTouches[0].clientY;
+      var scroll = endY - startY;
+      var limit = 50;
+      e.preventDefault()
+      if (scroll >= limit && currentPage > 0) {
+        currentPage--;
+        console.log(currentPage);
+        goPage(currentPage);
+      } else if (scroll <= -limit && currentPage < pagesOffsetTop.length) {
+        currentPage++;
+        console.log(currentPage);
+        goPage(currentPage);
+      }
+      startY = 0;
+      endY = 0;
+    }
+  }, true);
+  window.go = goPage;
+
+</script>
+</body>
+</html>
